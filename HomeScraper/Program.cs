@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace HomeScraper {
@@ -17,13 +18,16 @@ https://www.otodom.pl/pl/oferta/mieszkanie-ul-obroncow-tobruku-38-fort-bema-ID4l
 https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
 ".Split("\r\n").Where(x => !string.IsNullOrEmpty(x));
 
-			var providers = ProviderFactory.GetProviders();
+            var providers = ProviderFactory.GetProviders();
 
-			var homeData = new List<HomeData>();
+			var homeData = GetHomeData();
 			HomeData data;
 			foreach (IProvider provider in providers) {
 				// TODO match provider with link
 				foreach (string link in links) {
+					if (homeData.Any(d => d.Link == link))
+						continue;
+
 					Console.WriteLine("Scraping " + link);
 					try {
 						data = provider.GetHomeData(link);
@@ -38,9 +42,16 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
 				}
 			}
 
+			Serialize(homeData);
 			SaveToCSV(homeData);
 		}
 
+		static List<HomeData> GetHomeData() {
+			if (File.Exists(serializationFilePath))
+				return Deserialize();
+			else
+				return [];
+        }
 
 		const string csvDelimiter = "|";
         const string csvFilePath = "HomeData.csv";
@@ -51,5 +62,18 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
                 fileWriter.WriteLine(string.Join(csvDelimiter, hd.CSVRow()));
             fileWriter.Close();
         }
-	}
+
+		const string serializationFilePath = "homeData.xml";
+		static void Serialize(IEnumerable<HomeData> homeData) {
+            using var stream = HomeDataSerialization.Serialize(homeData);
+            using var fileStream = File.Create(serializationFilePath);
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.CopyTo(fileStream);
+        }
+
+        static List<HomeData> Deserialize() {
+            using var fileStream = new FileStream(serializationFilePath, FileMode.Open, FileAccess.Read);
+			return HomeDataSerialization.Deserialize(fileStream);
+        }
+    }
 }
