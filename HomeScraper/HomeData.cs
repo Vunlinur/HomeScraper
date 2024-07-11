@@ -8,6 +8,7 @@ namespace HomeScraper {
 	class HomeData {
 		// TODO add garage, scrape date
 		public int Price;
+		public int Rent;
 
 		public float Area;
 		public int Rooms;
@@ -18,18 +19,5 @@ namespace HomeScraper {
 
 		public string Link;
 		public string Provider;
-
-		public override string ToString() {
-			return string.Join("|", new[] {
-				Price.ToString(),
-				Area.ToString(),
-				Rooms.ToString(),
-				LandArea.ToString(),
-				Address,
-				Distance.ToString(),
-				Link,
-				Provider
-			});
-		}
-	}
+    }
 }
