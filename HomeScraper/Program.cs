@@ -20,7 +20,7 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
 
             var providers = ProviderFactory.GetProviders();
 
-			var homeData = GetHomeData();
+			var homeData = HomeDataSerialization.GetHomeData();
 			HomeData data;
 			foreach (IProvider provider in providers) {
 				// TODO match provider with link
@@ -42,16 +42,9 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
 				}
 			}
 
-			Serialize(homeData);
+            HomeDataSerialization.SerializeAndWrite(homeData);
 			SaveToCSV(homeData);
 		}
-
-		static List<HomeData> GetHomeData() {
-			if (File.Exists(serializationFilePath))
-				return Deserialize();
-			else
-				return [];
-        }
 
 		const string csvDelimiter = "|";
         const string csvFilePath = "HomeData.csv";
@@ -61,19 +54,6 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
             foreach (HomeData hd in homeData)
                 fileWriter.WriteLine(string.Join(csvDelimiter, hd.CSVRow()));
             fileWriter.Close();
-        }
-
-		const string serializationFilePath = "homeData.xml";
-		static void Serialize(IEnumerable<HomeData> homeData) {
-            using var stream = HomeDataSerialization.Serialize(homeData);
-            using var fileStream = File.Create(serializationFilePath);
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.CopyTo(fileStream);
-        }
-
-        static List<HomeData> Deserialize() {
-            using var fileStream = new FileStream(serializationFilePath, FileMode.Open, FileAccess.Read);
-			return HomeDataSerialization.Deserialize(fileStream);
         }
     }
 }

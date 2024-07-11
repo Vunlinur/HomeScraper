@@ -8,6 +8,26 @@ using System.Xml.Serialization;
 
 namespace HomeScraper {
     static class HomeDataSerialization {
+        public static List<HomeData> GetHomeData() {
+            if (File.Exists(serializationFilePath))
+                return ReadAndDeserialize();
+            else
+                return [];
+        }
+
+        const string serializationFilePath = "homeData.xml";
+        public static void SerializeAndWrite(IEnumerable<HomeData> homeData) {
+            using var stream = Serialize(homeData);
+            using var fileStream = File.Create(serializationFilePath);
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.CopyTo(fileStream);
+        }
+
+        public static List<HomeData> ReadAndDeserialize() {
+            using var fileStream = new FileStream(serializationFilePath, FileMode.Open, FileAccess.Read);
+            return Deserialize(fileStream);
+        }
+
         public static MemoryStream Serialize(IEnumerable<HomeData> homes) {
             var serializer = new XmlSerializer(typeof(List<HomeData>));
             var stream = new MemoryStream();
@@ -21,5 +41,7 @@ namespace HomeScraper {
             xml.Position = 0;
             return (List<HomeData>)serializer.Deserialize(xml);
         }
+
+
     }
 }
