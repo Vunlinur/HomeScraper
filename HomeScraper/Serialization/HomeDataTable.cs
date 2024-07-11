@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 
 namespace HomeScraper.Serialization {
-    static class HomeDataCSVExtensions {
+    static class HomeDataTable {
+        public static string[] Header() =>
+            GetFieldTuples(new()).Select(t => t.name).ToArray();
 
-        public static string[] CSVHeaders(this HomeData homeData) =>
-            GetFieldTuples(homeData).Select(t => t.name).ToArray();
-
-        public static string[] CSVRow(this HomeData homeData) =>
+        public static string[] Row(HomeData homeData) =>
             GetFieldTuples(homeData).Select(t => t.value?.ToString()).ToArray();
 
         private static (string name, object value)[] GetFieldTuples(HomeData d) => [

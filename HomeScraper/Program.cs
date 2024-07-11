@@ -43,18 +43,9 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
                 }
             }
 
-            HomeDataSerialization.SerializeAndWrite(homeData);
-            SaveToCSV(homeData);
-        }
-
-        const string csvDelimiter = "|";
-        const string csvFilePath = "HomeData.csv";
-        static void SaveToCSV(IEnumerable<HomeData> homeData) {
-            var fileWriter = new StreamWriter(csvFilePath);
-            fileWriter.WriteLine(string.Join(csvDelimiter, new HomeData().CSVHeaders()));
-            foreach (HomeData hd in homeData)
-                fileWriter.WriteLine(string.Join(csvDelimiter, hd.CSVRow()));
-            fileWriter.Close();
+            HomeDataSerialization.Save(homeData);
+            HomeDataSerializationMD.Save(homeData);
+            HomeDataSerializationCSV.Save(homeData);
         }
     }
 }

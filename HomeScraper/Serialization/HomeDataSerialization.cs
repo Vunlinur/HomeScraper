@@ -7,20 +7,20 @@ namespace HomeScraper.Serialization {
     static class HomeDataSerialization {
         public static List<HomeData> GetHomeData() {
             if (File.Exists(serializationFilePath))
-                return ReadAndDeserialize();
+                return Load();
             else
                 return [];
         }
 
         const string serializationFilePath = "homeData.xml";
-        public static void SerializeAndWrite(IEnumerable<HomeData> homeData) {
+        public static void Save(IEnumerable<HomeData> homeData) {
             using var stream = Serialize(homeData);
             using var fileStream = File.Create(serializationFilePath);
             stream.Seek(0, SeekOrigin.Begin);
             stream.CopyTo(fileStream);
         }
 
-        public static List<HomeData> ReadAndDeserialize() {
+        public static List<HomeData> Load() {
             using var fileStream = new FileStream(serializationFilePath, FileMode.Open, FileAccess.Read);
             return Deserialize(fileStream);
         }
