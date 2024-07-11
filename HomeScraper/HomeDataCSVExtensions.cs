@@ -15,7 +15,7 @@ namespace HomeScraper {
             GetFieldTuples(homeData).Select(t => t.name).ToArray();
 
         public static string[] CSVRow(this HomeData homeData) =>
-            GetFieldTuples(homeData).Select(t => t.value.ToString()).ToArray();
+            GetFieldTuples(homeData).Select(t => t.value?.ToString()).ToArray();
 
         private static (string name, object value)[] GetFieldTuples(HomeData d) => [
             (nameof(HomeData.Provider), d.Provider),

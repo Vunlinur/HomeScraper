@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HomeScraper {
-	class HomeData {
+	public class HomeData {
 		// TODO add garage, scrape date
 		public int Price;
 		public int Rent;
