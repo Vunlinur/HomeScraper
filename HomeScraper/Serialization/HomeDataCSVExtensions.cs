@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Collections;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
-namespace HomeScraper {
+namespace HomeScraper.Serialization {
     static class HomeDataCSVExtensions {
 
         public static string[] CSVHeaders(this HomeData homeData) =>

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using HomeScraper.ProviderBase;
+using HomeScraper.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace HomeScraper {
-	class Program {
-		static void Main(string[] args) {
-			var links = @"
+    class Program {
+        static void Main(string[] args) {
+            var links = @"
 https://www.otodom.pl/pl/oferta/dwupokojowe-mieszkanie-48-mkw-metro-wawrzyszew-ID4rpdd
 https://www.otodom.pl/pl/oferta/2-pokoje-blisko-metra-ID4p9LC#map
 https://www.otodom.pl/pl/oferta/dwupokojowe-zoliborz-ul-elblaska-od-1-sierpnia-ID4giUf
@@ -20,33 +21,33 @@ https://www.otodom.pl/pl/oferta/2-pok-przy-parku-taras-garaz-w-cenie-ID4reCC
 
             var providers = ProviderFactory.GetProviders();
 
-			var homeData = HomeDataSerialization.GetHomeData();
-			HomeData data;
-			foreach (IProvider provider in providers) {
-				// TODO match provider with link
-				foreach (string link in links) {
-					if (homeData.Any(d => d.Link == link))
-						continue;
+            var homeData = HomeDataSerialization.GetHomeData();
+            HomeData data;
+            foreach (IProvider provider in providers) {
+                // TODO match provider with link
+                foreach (string link in links) {
+                    if (homeData.Any(d => d.Link == link))
+                        continue;
 
-					Console.WriteLine("Scraping " + link);
-					try {
-						data = provider.GetHomeData(link);
-						homeData.Add(data);
-					}
-					catch (Exception e) {
-						// TODO log
-						Console.WriteLine(e);
-					}
-					// TODO thread pooling
-					Thread.Sleep(2000);
-				}
-			}
+                    Console.WriteLine("Scraping " + link);
+                    try {
+                        data = provider.GetHomeData(link);
+                        homeData.Add(data);
+                    }
+                    catch (Exception e) {
+                        // TODO log
+                        Console.WriteLine(e);
+                    }
+                    // TODO thread pooling
+                    Thread.Sleep(2000);
+                }
+            }
 
             HomeDataSerialization.SerializeAndWrite(homeData);
-			SaveToCSV(homeData);
-		}
+            SaveToCSV(homeData);
+        }
 
-		const string csvDelimiter = "|";
+        const string csvDelimiter = "|";
         const string csvFilePath = "HomeData.csv";
         static void SaveToCSV(IEnumerable<HomeData> homeData) {
             var fileWriter = new StreamWriter(csvFilePath);
