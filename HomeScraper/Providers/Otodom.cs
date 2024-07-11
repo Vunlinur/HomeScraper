@@ -5,33 +5,36 @@ using System.Text.RegularExpressions;
 namespace HomeScraper.Providers {
 	[Provider]
 	class Otodom : IProvider {
-		const string valueCellClass = ".//div[@class='css-1wi2w6s']";
 		const string stripNonNumbers = @"[^,\d]";
-		// TODO inherit these fields
-		const string providerName = "otodom";
-		const string providerLink = "https://www.otodom.pl/";
+        const string valueCellClass = ".//div[contains(@class, 'css-1wi2w6s')]";
+        // TODO inherit these fields
+        const string providerName = "otodom";
 
 		public HomeData GetHomeData(string link) {
 			var web = new HtmlWeb();
 			var doc = web.Load(link);
 
-			var homeData = new HomeData();
-			homeData.Provider = providerName;
-			homeData.Link = link;
+            var homeData = new HomeData {
+                Provider = providerName,
+                Link = link
+            };
 
-			var price = doc.DocumentNode.SelectSingleNode("//strong[@data-cy='adPageHeaderPrice']").InnerText;
+            var price = doc.DocumentNode.SelectSingleNode("//strong[@data-cy='adPageHeaderPrice']").InnerText;
 			homeData.Price = int.Parse(Regex.Replace(price, stripNonNumbers, ""));
 
 			homeData.Address = doc.DocumentNode.SelectSingleNode("//a[@aria-label='Adres']").InnerText;
 
-			var area = doc.DocumentNode.SelectSingleNode("//*[@id=\"__next\"]/main/div[2]/div[2]/div[1]/div/div[1]/div[2]/div").InnerText;
+			var areaAria = doc.DocumentNode.SelectSingleNode("//div[@aria-label='Powierzchnia']");
+			var area = areaAria.SelectSingleNode(valueCellClass).InnerText;
 			homeData.Area = float.Parse(Regex.Replace(area, stripNonNumbers, ""));
 			
 			var landArea = doc.DocumentNode.SelectSingleNode("//div[@aria-label='Powierzchnia działki']")?.InnerText;
 			if (landArea is not null)
 				homeData.LandArea = float.Parse(Regex.Replace(landArea, stripNonNumbers, ""));
 
-			var rooms = doc.DocumentNode.SelectSingleNode("//*[@id=\"__next\"]/main/div[2]/div[2]/div[1]/div/div[3]/div[2]/div/a").InnerText;
+
+            var roomsAria = doc.DocumentNode.SelectSingleNode("//div[@aria-label='Liczba pokoi']");
+            var rooms = roomsAria.SelectSingleNode(valueCellClass).InnerText;
 			homeData.Rooms = int.Parse(Regex.Replace(rooms, stripNonNumbers, ""));
 
 			return homeData;
